@@ -97,7 +97,8 @@ print('Read CSV from file.')
 
 original_tweets = [tweet for tweet in tweets if tweet['reference_type'] == 'original_tweet']
 # we only need to consider retweets to calculate time lag to first retweet
-retweets = [tweet for tweet in tweets if tweet['reference_type'] != 'retweeted']
+retweets = [tweet for tweet in tweets if tweet['reference_type'] == 'retweeted']
+retweets = [tweet for tweet in tweets if tweet['text'].startswith('RT ')]
 print('Split tweets.')
 
 # setup some metrics for evaluation
@@ -105,7 +106,9 @@ total = 0
 unfound = 0
 
 for original_tweet in original_tweets:
-    related_tweets = [tweet for tweet in retweets if tweet['referenced_tweet_id'] == original_tweet['id']]
+    
+    related_tweets = [tweet for tweet in retweets if tweet['text'][tweet['text'].find(': ')+2:] in original_tweet['text']]
+    breakpoint()
     if int(original_tweet['retweet_count']) == 0:
         original_tweet['to_delete'] = False
         # by convention -1 is for non-retweeted tweets
@@ -116,7 +119,7 @@ for original_tweet in original_tweets:
         # entering this branch indicated missing tweets not returned by the twitter API
         unfound += 1
         original_tweet['to_delete'] = True
-    if len(related_tweets) == original_tweet['retweet_count'] and original_tweet['retweet_count'] > 0 :
+    if len(related_tweets) == int(original_tweet['retweet_count']) and int(original_tweet['retweet_count']) > 0 :
         # we have all retweets and can guarantee calculating a correct time difference
         time_diffs = [(DateTime(tweet['created_at']) - DateTime(original_tweet['created_at'])) for tweet in related_tweets]
         # convert days to seconds
@@ -124,7 +127,7 @@ for original_tweet in original_tweets:
         original_tweet['to_delete'] = False
     else:
         # entering this branch indicated missing tweets not returned by the twitter API
-        print('The API has not returned all retweets for this tweet.')
+        print(f"{len(related_tweets)} retweets found but {original_tweet['retweet_count']} should exist for {original_tweet['text']}.")
         unfound += 1
         original_tweet['to_delete'] = True
     total += 1
