@@ -62,7 +62,7 @@ with open(input_file, 'r') as i:
                 'author_name': row['author']['name'].replace('\n', ' ').strip(),
                 'author_follower_count': row['author']['public_metrics']['followers_count'],
                 'author_following_count': row['author']['public_metrics']['following_count'],
-                'author_tweet_count': row['author']['public_metrics']['followers_count'],
+                'author_tweet_count': row['author']['public_metrics']['tweet_count'],
                 'author_listed_count': row['author']['public_metrics']['listed_count'],
                 'author_username': row['author']['username'].replace('\n', ' ').strip(),
                 'author_verified': row['author']['verified'],
