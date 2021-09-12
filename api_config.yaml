@@ -1,17 +1,20 @@
+# https://pypi.org/project/searchtweets-v2/
 search_rules:
-#    start-time: 2020-01-06
-#    end-time: 2020-01-10
-    query: laschet has:hashtags
+    # may 9th 00am berlin time
+    start-time: 2021-05-08T22:00
+    # june 20 23:59 berlin time
+    end-time: 2021-06-20T21:59
+    query: '(@DIE_LINKE_LSA OR @GRUENE_LSA OR @AfD_LSA OR @cdulsa OR @SPD_LSA OR @FDP_LSA OR "Lydia Hüskens" OR "Eva von Angern" OR "Oliver Kirchner" OR "Katja Pähle" OR "Reiner Haseloff" OR "Cornelia Lüddemann" OR @Eva0112 OR @Connylue OR @reinerhaseloff OR @KatjaPaehle OR @LydiaHueskens OR @O_KirchnerAfD OR ((CDU OR AfD OR FDP OR SPD OR "die grünen" OR "die linken" OR "die linke" OR "b90" OR #afd OR #fdp OR #zweitstimmegrün OR #besserdielinke OR #dielinke) (#ltw2021 OR #ltw21 OR #ltwlsa21 OR #ltwlsa2021 OR #ltw21 OR #ltw2021 OR #sachsenanhalt OR landtagswahl OR "sachen-anhalt" or "sachsen anhalt"))) -is:nullcast -is:reply lang:de'
 
 search_params:
-    results-per-call: 10
-    max-tweets: 10
-    tweet-fields: id,created_at,author_id,text,public_metrics
-    user-fields: username
-    expansions: author_id
+    results-per-call: 500
+    max-tweets: 10000000 # just give them all
+    tweet-fields: id,text,author_id,conversation_id,created_at,lang,in_reply_to_user_id,public_metrics,referenced_tweets,reply_settings
+    user-fields: username,id,name,public_metrics,verified
+    expansions: author_id,referenced_tweets.id,referenced_tweets.id.author_id
 
 output_params:
     save_file: True
-    filename_prefix: test
+    filename_prefix: data_ltwsa_2021
     results_per_file: 100000
     output_format: a

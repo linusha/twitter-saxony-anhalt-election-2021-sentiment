@@ -9,7 +9,7 @@ search_tweets_v2:
 
 ## query
 
-python3 search_tweets.py --credential-file ../../.credentials.yaml --config-file ../../api_config.yaml --output-format a
+python3 search_tweets.py --credential-file ../../.credentials.yaml --config-file ../../api_config.yaml --no-print-stream --output-format a
 
 ## links
 
