@@ -31,7 +31,7 @@ output_fieldnames = [
 with open(input_file, 'r') as i:
     with open(output_file, 'w', newline = '' ) as o:
         output_writer = csv.DictWriter(o, fieldnames = output_fieldnames, delimiter = ',')
-    
+        output_writer.writeheader()
         for line in i:
             row = json.loads(line)
             
