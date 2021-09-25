@@ -96,19 +96,27 @@ with open(input_file, 'r') as i:
 print('Read CSV from file.')
 
 original_tweets = [tweet for tweet in tweets if tweet['reference_type'] == 'original_tweet']
+original_tweets_dict = {}
+for tweet in original_tweets:
+    original_tweets_dict[tweet['id']] = tweet
+original_tweets = list(original_tweets_dict.values())
+
 # we only need to consider retweets to calculate time lag to first retweet
 retweets = [tweet for tweet in tweets if tweet['reference_type'] == 'retweeted']
-retweets = [tweet for tweet in tweets if tweet['text'].startswith('RT ')]
+retweet_dict = {}
+for tweet in retweets:
+    retweet_dict[tweet['id']] = tweet
+retweets = list(retweet_dict.values())
+
 print('Split tweets.')
 
 # setup some metrics for evaluation
 total = 0
 unfound = 0
-
 for original_tweet in original_tweets:
     
-    related_tweets = [tweet for tweet in retweets if tweet['text'][tweet['text'].find(': ')+2:] in original_tweet['text']]
-    breakpoint()
+    related_tweets = [tweet for tweet in retweets if tweet['referenced_tweet_id'] == original_tweet['id']]
+    #breakpoint()
     if int(original_tweet['retweet_count']) == 0:
         original_tweet['to_delete'] = False
         # by convention -1 is for non-retweeted tweets
