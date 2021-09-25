@@ -1,0 +1,22 @@
+# https://pypi.org/project/searchtweets-v2/
+search_rules:
+    # may 9th 00am berlin time
+    start_time: 2021-05-08 22:00
+    # june 20 23:59 berlin time
+    end_time: 2021-06-20 21:59
+    # run one time with -is:retweet and one time with is:retweet
+    query: '(@DIE_LINKE_LSA OR @GRUENE_LSA OR @AfD_LSA OR @cdulsa OR @SPD_LSA OR @FDP_LSA OR "Lydia Hüskens" OR "Eva von Angern" OR "Oliver Kirchner" OR "Katja Pähle" OR "Reiner Haseloff" OR "Cornelia Lüddemann" OR @Eva0112 OR @Connylue OR @reinerhaseloff OR @KatjaPaehle OR @LydiaHueskens OR @O_KirchnerAfD OR ((CDU OR AfD OR FDP OR SPD OR "die grünen" OR "die linken" OR "die linke" OR "b90" OR #afd OR #fdp OR #zweitstimmegrün OR #besserdielinke OR #dielinke) (#ltw2021 OR #ltw21 OR #ltwlsa21 OR #ltwlsa2021 OR #ltw21 OR #ltw2021 OR #sachsenanhalt OR landtagswahl OR "sachen-anhalt" or "sachsen anhalt"))) -is:nullcast -is:quote -is:reply -is:retweet lang:de'
+
+search_params:
+    results_per_call: 100
+    max_tweets: 10000000 # just give them all
+    tweet_fields: id,text,author_id,conversation_id,created_at,lang,in_reply_to_user_id,public_metrics,referenced_tweets,reply_settings
+    user_fields: username,id,name,public_metrics,verified
+    expansions: author_id,referenced_tweets.id,referenced_tweets.id.author_id
+
+output_params:
+    save_file: True
+    #filename_prefix: data_ltwsa_2021
+    filename_prefix: retweets_ltwsa_2021
+    results_per_file: 10000000
+    output_format: a

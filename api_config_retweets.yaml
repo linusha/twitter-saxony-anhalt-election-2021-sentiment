@@ -16,6 +16,7 @@ search_params:
 
 output_params:
     save_file: True
-    filename_prefix: data_ltwsa_2021
-    results_per_file: 10000
+    #filename_prefix: data_ltwsa_2021
+    filename_prefix: retweets_ltwsa_2021
+    results_per_file: 10000000
     output_format: a
