@@ -1,0 +1,40 @@
+---
+title: "Modelling"
+author: "Linus Hagemann"
+date: "9/25/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(here)
+load(here('final_dataset.RData'))
+# otherwise log transformation fails
+data <- data[data$author_follower_count > 0,]
+```
+
+# H1
+
+```{r H1}
+summary(glm.nb(retweet_count ~ sentiment + hashtag_count + url_existence + log(user_activity) + log(author_follower_count), data = data))
+```
+
+# H2
+
+```{r H2}
+summary(lm(log(retweet_timelag) ~ sentiment + hashtag_count + url_existence + log(author_follower_count) + log(user_activity), data = data[data$retweet_count > 0,]))
+```
+
+# H3A
+
+```{r H3A}
+summary(glm.nb(retweet_count ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(user_activity) + log(author_follower_count), data = data))
+```
+
+# H3B
+
+```{r H3B}
+summary(lm(log(retweet_timelag) ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(author_follower_count) + log(user_activity), data = data[data$retweet_count > 0,]))
+```
+

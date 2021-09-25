@@ -24,3 +24,7 @@ Run `transform_json.py` on the `JSON` output of the twitter API to transform it 
 ## Technical Setup
 
 This code was developed for and used on a UNIX system. If you are on windows, intricacies like line-breaks might need further adjustments in the code.
+
+java -jar SentiStrengthCom.jar input ../tweet_text.csv sentidata ~/twitter-saxony-anhalt-eletion-2021/SentiStrength/SentiStrength_Data/ EmotionLookupTable ~/twitter-saxony-anhalt-eletion-2021/SentiStrength/SentiStrength_Data/EmotionLookupTable_v5_fullforms.txt explain
+
+
