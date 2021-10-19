@@ -8,33 +8,61 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(MASS)
+library(rsq)
 library(here)
 load(here('final_dataset.RData'))
 # otherwise log transformation fails
 data <- data[data$author_follower_count > 0,]
+# TODO: fixme and put in a nice place
+# save(data, file = here('prod.RData'))
 ```
 
 # H1
 
 ```{r H1}
-summary(glm.nb(retweet_count ~ sentiment + hashtag_count + url_existence + log(user_activity) + log(author_follower_count), data = data))
+h1 <- glm.nb(retweet_count ~ sentiment + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
+summary(h1)
+# adjusted r squared
+rsq(h1, adj = TRUE)
+# exponentiated coefficients for effectsize
+exp(h1$coefficients)
 ```
 
 # H2
 
+## Shapiro-Wilk test for timelag
+
+Test seems to be of doubtful relevance with large data sets. 
+```{r}
+library(nortest)
+shapiro.test(data[data$retweet_count > 0,]$retweet_timelag)
+# https://en.wikipedia.org/wiki/Shapiro%E2%80%93Francia_test
+sf.test(data[data$retweet_count > 0,]$retweet_timelag)
+hist(log(data[data$retweet_count > 0,]$retweet_timelag))
+shapiro.test(log(data[data$retweet_count > 0,]$retweet_timelag))
+```
+
+
+
+## Regression
 ```{r H2}
-summary(lm(log(retweet_timelag) ~ sentiment + hashtag_count + url_existence + log(author_follower_count) + log(user_activity), data = data[data$retweet_count > 0,]))
+summary(lm(log(retweet_timelag) ~ sentiment + hashtag_count + url_existence + log(author_follower_count) + log(user_activity) + author_verified, data = data[data$retweet_count > 0,]))
 ```
 
 # H3A
 
 ```{r H3A}
-summary(glm.nb(retweet_count ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(user_activity) + log(author_follower_count), data = data))
+h3 <- glm.nb(retweet_count ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
+summary(h3)
+# adjusted r squared
+rsq(h3, adj = TRUE)
+# exponentiated coefficients for effectsize
+exp(h3$coefficients)
 ```
 
 # H3B
 
 ```{r H3B}
-summary(lm(log(retweet_timelag) ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(author_follower_count) + log(user_activity), data = data[data$retweet_count > 0,]))
+summary(lm(log(retweet_timelag) ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(author_follower_count) + log(user_activity) + author_verified, data = data[data$retweet_count > 0,]))
 ```
 
