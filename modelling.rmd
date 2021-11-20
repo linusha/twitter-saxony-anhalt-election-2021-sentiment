@@ -8,19 +8,49 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(MASS)
+library(dplyr)
 library(rsq)
 library(here)
-load(here('final_dataset.RData'))
+library(corrplot)
+load(here('prod.RData'))
 # otherwise log transformation fails
-data <- data[data$author_follower_count > 0,]
+# data <- data[data$author_follower_count > 0,]
 # TODO: fixme and put in a nice place
 # save(data, file = here('prod.RData'))
 ```
 
-# H1
+```{r include=FALSE}
+# # merge with liwc data
+# liwc_data <- read.csv(here('liwc.csv'))
+# data <- cbind(data, liwc_data)
+# data$negemo <- gsub(",",".", data$negemo)
+# data$posemo <- gsub(",", ".", data$posemo)
+# data$negemo <- as.numeric(data$negemo)
+# data$posemo <- as.numeric(data$posemo)
+# data$total_liwc_sentiment <- data$negemo + data$posemo
+# save(data, file= here('prod.RData'))
+# data$Tone <- gsub(",", ".", data$Tone)
+# data$Tone <- as.numeric(data$Tone)
+# data$author_verified <- ifelse(data$author_verified == "True", TRUE, FALSE)
+# data$is_Negative <- as.numeric(data$is_Negative)
+# data$author_verified <- as.numeric(data$author_verified)
+```
+
+# H1 with SentiStength
 
 ```{r H1}
 h1 <- glm.nb(retweet_count ~ sentiment + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
+summary(h1)
+# adjusted r squared
+rsq(h1, adj = TRUE)
+# exponentiated coefficients for effectsize
+exp(h1$coefficients)
+```
+
+# H1 with LIWC data
+
+```{r H1LIWC}
+h1 <- glm.nb(retweet_count ~ total_liwc_sentiment + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
 summary(h1)
 # adjusted r squared
 rsq(h1, adj = TRUE)
@@ -44,12 +74,27 @@ shapiro.test(log(data[data$retweet_count > 0,]$retweet_timelag))
 
 
 
-## Regression
+## Regression with SentiStrength Data
 ```{r H2}
 summary(lm(log(retweet_timelag) ~ sentiment + hashtag_count + url_existence + log(author_follower_count) + log(user_activity) + author_verified, data = data[data$retweet_count > 0,]))
 ```
 
-# H3A
+## Regression with LIWC Data
+
+```{r H2LIWC}
+summary(lm(log(retweet_timelag) ~ total_liwc_sentiment + hashtag_count + url_existence + log(author_follower_count) + log(user_activity) + author_verified, data = data[data$retweet_count > 0,]))
+```
+
+# H3A with SentiStrength Data
+
+```{r include=FALSE}
+# data$liwc_polarity <- data$posemo - data$negemo
+# data$liwc_isNegative <- ifelse(data$liwc_polarity < 0, 1, 0)
+# data$liwc_interaction_term <- data$liwc_isNegative * data$total_liwc_sentiment
+# data$liwc_isNegative_tone <- ifelse(data$Tone < 0.5, 1, 0)
+# data$liwc_interaction_term_tone <- data$liwc_isNegative_tone * data$Tone
+```
+
 
 ```{r H3A}
 h3 <- glm.nb(retweet_count ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
@@ -60,9 +105,35 @@ rsq(h3, adj = TRUE)
 exp(h3$coefficients)
 ```
 
-# H3B
+# H3A with LIWC Data
+
+```{r H3ALIWC}
+h3 <- glm.nb(retweet_count ~ total_liwc_sentiment + liwc_isNegative + liwc_interaction_term + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
+summary(h3)
+# adjusted r squared
+rsq(h3, adj = TRUE)
+# exponentiated coefficients for effectsize
+exp(h3$coefficients)
+```
+
+# H3B with SentiStrength Data
 
 ```{r H3B}
 summary(lm(log(retweet_timelag) ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(author_follower_count) + log(user_activity) + author_verified, data = data[data$retweet_count > 0,]))
 ```
 
+# H3B with LIWC Data
+
+```{r H3BLIWC}
+summary(lm(log(retweet_timelag) ~ total_liwc_sentiment + liwc_isNegative + liwc_interaction_term + hashtag_count + url_existence + log(author_follower_count) + log(user_activity) + author_verified, data = data[data$retweet_count > 0,]))
+```
+
+# Comparison between LIWC and SentiStrength / Correlations
+
+```{r}
+used_subset <- select(data, retweet_count, sentiment, hashtag_count, url_existence, user_activity, author_follower_count, author_verified, total_liwc_sentiment, retweet_timelag, liwc_isNegative, liwc_interaction_term, interaction_term, is_Negative)
+corrplot(cor(used_subset))
+plot(data$total_liwc_sentiment, data$sentiment)
+plot(data$negemo, data$posemo)
+plot(data$Positive, data$Negative)
+```
