@@ -12,6 +12,10 @@ library(dplyr)
 library(rsq)
 library(here)
 library(corrplot)
+library(Hmisc)
+library(rcompanion)
+library(pscl)
+
 load(here('prod.RData'))
 # otherwise log transformation fails
 # data <- data[data$author_follower_count > 0,]
@@ -42,10 +46,16 @@ load(here('prod.RData'))
 h1 <- glm.nb(retweet_count ~ sentiment + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
 summary(h1)
 # adjusted r squared
-rsq(h1, adj = TRUE)
+# rsq(h1, adj = TRUE) # OA: the result looks suspicious 
+# rsq(h1, adj = FALSE, type=c('lr')) # OA: mirrors Cox and Snell pseudo R2
+# rsq(h1, adj = FALSE, type=c('n')) # OA: mirrors Nagelkerke pseudo R2
+# LH: I suggest to just go with this function, as it gives us the most bang-for-the-buck :)
+nagelkerke(h1) # the McFadden, Cox and Snell, and Nagelkerke pseudo R2 from the library(rcompanion)
 # exponentiated coefficients for effectsize
 exp(h1$coefficients)
+odTest(h1)
 ```
+negative-binomial model instead of poisson is justified, i.e. count data is overdispersed
 
 # H1 with LIWC data
 
@@ -53,9 +63,10 @@ exp(h1$coefficients)
 h1 <- glm.nb(retweet_count ~ total_liwc_sentiment + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
 summary(h1)
 # adjusted r squared
-rsq(h1, adj = TRUE)
+nagelkerke(h1) 
 # exponentiated coefficients for effectsize
 exp(h1$coefficients)
+odTest(h1)
 ```
 
 # H2
@@ -100,9 +111,10 @@ summary(lm(log(retweet_timelag) ~ total_liwc_sentiment + hashtag_count + url_exi
 h3 <- glm.nb(retweet_count ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
 summary(h3)
 # adjusted r squared
-rsq(h3, adj = TRUE)
+nagelkerke(h3) 
 # exponentiated coefficients for effectsize
 exp(h3$coefficients)
+odTest(h3)
 ```
 
 # H3A with LIWC Data
@@ -111,10 +123,13 @@ exp(h3$coefficients)
 h3 <- glm.nb(retweet_count ~ total_liwc_sentiment + liwc_isNegative + liwc_interaction_term + hashtag_count + url_existence + log(user_activity) + log(author_follower_count) + author_verified, data = data)
 summary(h3)
 # adjusted r squared
-rsq(h3, adj = TRUE)
+nagelkerke(h3) 
 # exponentiated coefficients for effectsize
 exp(h3$coefficients)
+odTest(h3)
 ```
+
+Output for overdispersion test should always be the same, as it depends on the dispersion of the retweet_count which is constant through all models. I have included it after every model just to make sure.
 
 # H3B with SentiStrength Data
 
@@ -133,6 +148,7 @@ summary(lm(log(retweet_timelag) ~ total_liwc_sentiment + liwc_isNegative + liwc_
 ```{r}
 used_subset <- select(data, retweet_count, sentiment, hashtag_count, url_existence, user_activity, author_follower_count, author_verified, total_liwc_sentiment, retweet_timelag, liwc_isNegative, liwc_interaction_term, interaction_term, is_Negative)
 corrplot(cor(used_subset))
+rcorr(as.matrix(used_subset))
 plot(data$total_liwc_sentiment, data$sentiment)
 plot(data$negemo, data$posemo)
 plot(data$Positive, data$Negative)
