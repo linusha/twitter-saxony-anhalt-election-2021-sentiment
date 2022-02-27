@@ -2,7 +2,9 @@
 title: "Modelling"
 author: "Linus Hagemann"
 date: "9/25/2021"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -32,7 +34,8 @@ describe(data[, c("retweet_count")], trim = 0.2)
 describe(data_subset_retweeted[, c("retweet_timelag")], trim = 0.2)
 boxplot(data_subset_retweeted[, c("retweet_timelag")], trim = 0.2)
 ```
-
+  
+  
 Min time to 1st retweet = 3 sec. Max time is 1272279 sec = 353 hours= 14.7 days.   
 Arguments: information diffusion is normally largely complete within 1-2 hours (Gorodnichenko et al. 2021)  
 S&D-X (2013): rt_timelag (in minutes) for BW&RW sample Mean=72, SD=291. Hence, ```mean+3SD= 72+3*291``` = 945 min = ca. 16 hours. ```mean+5SD = 72+5*291```= 1527 min  = ca. 25 hours.  
@@ -43,7 +46,8 @@ We applied a "generous" criteria, sorting out content that was retweeted later t
 data_subset_retweeted_72h<- data_subset_retweeted[data_subset_retweeted$retweet_timelag < 259200,]
 dim(data_subset_retweeted_72h)
 ```
-Thus, with ```retweet_timelag < 259200```, we have N=3671. 
+  
+  Thus, with ```retweet_timelag < 259200```, we have N=3671. 
 
 ```{r}
 describe(data_subset_retweeted_72h[, c("retweet_timelag")], trim = 0.2)
@@ -54,34 +58,44 @@ boxplot(data_subset_retweeted_72h[, c("retweet_timelag")], trim = 0.2)
 data_subset_retweeted_36h<- data_subset_retweeted[data_subset_retweeted$retweet_timelag < 129600,]
 dim(data_subset_retweeted_36h)
 ```
-Thus, with ```retweet_timelag < 129600```, we have N=3653. 
+  
+  Thus, with ```retweet_timelag < 129600```, we have N=3653. 
 
 #### Applying 24 hours restriction (86400 sec)  
 ```{r}
 data_subset_retweeted_24h<- data_subset_retweeted[data_subset_retweeted$retweet_timelag < 86400,]
 dim(data_subset_retweeted_24h)
 ```
-Thus, with ```retweet_timelag < 86400```, we have N=3645. 
+  
+  Thus, with `retweet_timelag < 86400`, we have N=3645. 
 ```{r}
 describe(data_subset_retweeted_24h[, c("retweet_timelag")], trim = 0.2)
 boxplot(data_subset_retweeted_24h[, c("retweet_timelag")], trim = 0.2)
 ```
 
-Let's convert ```retweet_timelag```, originally measured in sec. into min as in S&D-X (2013). 
+  
+  Let's convert `retweet_timelag`, originally measured in sec. into min as in S&D-X (2013). 
 ```{r}
 data_subset_retweeted_24h$retweet_timelag_min<-(data_subset_retweeted_24h$retweet_timelag)/60
 ```
-Descriptive statistics 
+  
+  Descriptive statistics 
 ```{r}
 describe(data_subset_retweeted_24h[, c("retweet_timelag_min")], trim = 0.2)
 boxplot(data_subset_retweeted_24h[, c("retweet_timelag_min")], trim = 0.2)
 ```
-For further computations for H2 and H3b, let's use the sample ```data_subset_retweeted_24h``` and ```retweet_timelag_min```
+  
+  For further computations for H2 and H3b, let's use the sample `data_subset_retweeted_24h` and `retweet_timelag_min`.
 
 ```{r,  fig.height = 3, fig.width = 5, fig.align = "center"}
-hist(data_subset_retweeted_24h$retweet_timelag_min, breaks=5)
+hist(data_subset_retweeted_24h$retweet_timelag_min, breaks=5, 
+     main="Time to 1st retweet",
+xlab="Time lag in minutes",
+col="darkmagenta",
+freq=FALSE)
 ```
-Histogram informs that most of tweet dissemination happens within 500 min = 8 hours 20 min. 
+  
+  Density plot informs that most of tweet dissemination happens within 500 min = 8 hours 20 min. 
 
 
 ## Independent variables (full sample, N=9894)
@@ -108,30 +122,35 @@ describe(data_subset_retweeted[, c("retweet_count", "sentiment", "hashtag_count"
 
 ## Correlation Matrix of Independent Variables  (full sample, N=9894)
 ```{r}
-used_subset <- select(data, sentiment, total_liwc_sentiment, hashtag_count, url_existence, author_follower_count, user_activity)
-corrplot(cor(used_subset))
-rcorr(as.matrix(used_subset))
+used_subset <- select(data, sentiment, total_liwc_sentiment, hashtag_count, url_existence, user_activity, author_follower_count)
+corrplot(cor(used_subset), method = 'number', type = 'lower')
+Pearson<-rcorr(as.matrix(used_subset), type="pearson")
+Pearson 
 ```
   
-  Correlation Matrix of independent variables suggests no high correlations, thus, we assume multicollinearity is not an issue in our data.    
+  Correlation Matrix of independent variables suggests no high correlations, thus, we assume multicollinearity is not an issue in our data (N=9894).    
 
+
+## Correlation Matrix of Independent Variables  (resticted sample, N=3645)
 ```{r}
-used_subset <- select(data_subset_retweeted_24h, sentiment, hashtag_count, url_existence, user_activity, author_follower_count, total_liwc_sentiment)
-rcorr(as.matrix(used_subset))
+used_subset <- select(data_subset_retweeted_24h, sentiment,total_liwc_sentiment, hashtag_count, url_existence, user_activity, author_follower_count)
+corrplot(cor(used_subset), method = 'number', type = 'lower')
+Pearson<-rcorr(as.matrix(used_subset), type="pearson")
+Pearson 
 ```
+Correlation Matrix of independent variables suggests no high correlations, thus, we assume multicollinearity is not an issue in our data (N=3645).
 
 # 3.1.1.	Methodological replication with sentiment analysis done in SentiStrength
 
-# H1 with SentiStength
+## H1 with SentiStength
 
-```{r H1}
+```{r H1 SentiStrength}
 h1 <- glm.nb(retweet_count ~ sentiment + hashtag_count + url_existence + log(user_activity) + log(author_follower_count), data = data)
 summary(h1)
 # adjusted r squared
 # rsq(h1, adj = TRUE) # OA: the result looks suspicious 
 # rsq(h1, adj = FALSE, type=c('lr')) # OA: mirrors Cox and Snell pseudo R2
 # rsq(h1, adj = FALSE, type=c('n')) # OA: mirrors Nagelkerke pseudo R2
-# LH: I suggest to just go with this function, as it gives us the most bang-for-the-buck :)
 nagelkerke(h1) # the McFadden, Cox and Snell, and Nagelkerke pseudo R2 from the library(rcompanion)
 # exponentiated coefficients for effectsize
 exp(h1$coefficients)
@@ -140,10 +159,8 @@ odTest(h1)
 Negative-binomial model instead of poisson is justified, i.e. count data is overdispersed. 
 
 
-# H2
-
-## Regression with SentiStrength Data
-```{r H2}
+## H2 with SentiStrength 
+```{r H2 SentiStrength}
 summary(h2<-lm(log(retweet_timelag_min) ~ sentiment + hashtag_count + url_existence + log(author_follower_count) + log(user_activity), data = data_subset_retweeted_24h))
 ```
 
@@ -158,14 +175,13 @@ length(influential)# 167 influential observations
 #head(data[influential, ])  # influential observations.
 ```
 
-# H3A with SentiStrength Data
-
-```{r H3A}
+# H3A with SentiStrength 
+```{r H3A SentiStrength}
 h3a <- glm.nb(retweet_count ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(user_activity) + log(author_follower_count), data = data)
 summary(h3a)
 # adjusted r squared
 nagelkerke(h3a) 
-# exponentiated coefficients for effectsize
+# exponentiated coefficients for effect size
 exp(h3a$coefficients)
 odTest(h3a)
 ```
@@ -175,7 +191,7 @@ Output for overdispersion test should always be the same, as it depends on the d
 
 # H3B with SentiStrength Data
 
-```{r H3B}
+```{r H3B SentiStrength}
 h3b <- lm(log(retweet_timelag_min) ~ sentiment + is_Negative + interaction_term + hashtag_count + url_existence + log(author_follower_count) + log(user_activity), data = data_subset_retweeted_24h)
 summary(h3b)
 ```
@@ -197,7 +213,7 @@ odTest(h1_liwc)
 ```
 
 
-## H2 Regression with LIWC Data
+## H2 with LIWC Data
 
 ```{r H2LIWC}
 summary(h2_liwc<-lm(log(retweet_timelag_min) ~ total_liwc_sentiment + hashtag_count + url_existence + log(author_follower_count) + log(user_activity), data = data_subset_retweeted_24h))
@@ -211,7 +227,7 @@ h3a_liwc<- glm.nb(retweet_count ~ total_liwc_sentiment + liwc_isNegative + liwc_
 summary(h3a_liwc)
 # adjusted r squared
 nagelkerke(h3a_liwc) 
-# exponentiated coefficients for effectsize
+# exponentiated coefficients for effect size
 exp(h3a_liwc$coefficients)
 odTest(h3a_liwc)
 ```
@@ -222,6 +238,7 @@ h3b_liwc <- lm(log(retweet_timelag_min) ~ total_liwc_sentiment + liwc_isNegative
 summary(h3b_liwc)
 ```
 
+# THE END :) 
 
 # Diagnostic tests for the assumptions of linear regressions H2 & H3B
 
