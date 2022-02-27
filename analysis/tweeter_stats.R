@@ -24,6 +24,11 @@ top_50_stats <- data %>%
   slice_head(n = 50) %>%
   summarise(across(where(is.numeric), ~ sum(., is.na(.), 0)))
 
-user = data %>% group_by(author_name) %>% summarise(avg=mean(author_follower_count))
+
+user = data %>% 
+  group_by(author_name) %>%
+  summarise(avg=mean(author_follower_count))
+
 mean(user$avg)
+
 median(user$avg)

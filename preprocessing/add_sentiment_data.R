@@ -1,22 +1,12 @@
----
-title: "Add Sentiment Data"
-author: "Linus Hagemann"
-date: "9/25/2021"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r export tweets}
+# FIRST STEP
 # export tweets to run senti strength
 data <- read.csv('data.csv')
 tweets <- data$processed_text
 write.csv(tweets,'tweet_text.csv')
-```
 
-```{r add sentiment data}
+# Run SentiStrength Analysis
+
+# SECOND STEP
 # add senti strength data and derived features to data set
 data <- read.csv('data.csv')
 sentiment_data <- read.csv('tweet_text0_out.txt', sep="\t")
@@ -30,7 +20,6 @@ sentiment_data$Text <- NULL
 data <- cbind(data, sentiment_data)
 write.csv(data, 'final_dataset.csv')
 save(data, file = 'final_dataset.RData')
-```
 
 
 

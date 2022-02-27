@@ -40,7 +40,7 @@ print('Read CSV from file.')
 original_tweets_authors = [tweet['author_id'] for tweet in tweets if tweet['reference_type'] != 'retweeted' and int(tweet['retweet_count']) > 0]
 original_tweets_authors = list(set(original_tweets_authors))
 print(len(original_tweets_authors))
-restart = original_tweets_authors.index('53723830')
+restart = 0 # in case you need to restart the data collection more than once
 original_tweets_authors = original_tweets_authors[restart:]
 print(len(original_tweets_authors))
 with Sultan.load(cwd=PATH_TO_API_SCRIPT) as s:

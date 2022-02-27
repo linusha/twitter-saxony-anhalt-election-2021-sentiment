@@ -2,7 +2,6 @@ import sys
 import csv
 # https://pypi.org/project/DateTime/
 from DateTime import DateTime
-from statistics import mean
 import re
 
 input_file = sys.argv[1]
@@ -116,7 +115,6 @@ unfound = 0
 for original_tweet in original_tweets:
     
     related_tweets = [tweet for tweet in retweets if tweet['referenced_tweet_id'] == original_tweet['id']]
-    #breakpoint()
     if int(original_tweet['retweet_count']) == 0:
         original_tweet['to_delete'] = False
         # by convention -1 is for non-retweeted tweets
