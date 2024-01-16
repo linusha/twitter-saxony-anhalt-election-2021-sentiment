@@ -2,13 +2,13 @@
 
 This repository contains code and data used in the research paper
 
-> Emotions and Information Diffusion on Social Media: A Replication in the Context of Political Communication on Twitter. Hagemann, L., Abramova, O.
+> Hagemann, Linus and Abramova, Olga (2023) "Emotions and Information Diffusion on Social Media: A Replication in the Context of Political Communication on Twitter," *AIS Transactions on Replication Research*: Vol. 9, Article 2. DOI: 10.17705/1atrr.00079. https://aisel.aisnet.org/trr/vol9/iss1/2.
 
-which has been accepted for publication in [AIS Transactions on Replication Research](https://aisel.aisnet.org/trr/).
+Please note the linceses specified below and cite the paper when possible.
 
 ## Process Documentation
 
-The following paragraphs should give you a good overview of how to use the scripts in this repository given previous exposure to the command line, python and R. Please see the corresponding publication for further details.
+The following paragraphs should give you a good overview of how to use the scripts in this repository given previous exposure to the command line, `python` and `R`. Please see the corresponding publication for further details.
 
 Following the steps outlined below should allow you to replicate our findings, beginning with the collection of tweets. Please be aware that the availability of tweets might have changed since we collected the original data set. For entry-point ready data-sets, please take a look at the "Data" section below.
 
